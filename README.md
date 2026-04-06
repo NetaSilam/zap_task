@@ -19,14 +19,14 @@ Input CSV
 ┌─────────────────────────────────────────┐
 │ 1. Normalization  (utils.py)            │
 │    • Hebrew brands → English            │
-│      "סמסונג" → "samsung"              │
+│      "סמסונג" → "samsung"              │ 
 │    • Remove punctuation & noise words   │
 │    • Collapse whitespace                │
 └──────────────────┬──────────────────────┘
                    │
                    ▼
 ┌─────────────────────────────────────────┐
-│ 2. TF-IDF Blocking  (deduplicator.py)  │
+│ 2. TF-IDF Blocking  (deduplicator.py)   │
 │    • char n-gram cosine similarity      │
 │    • Only compares within same category │
 │    • Produces small set of candidates   │
@@ -37,9 +37,9 @@ Input CSV
 ┌─────────────────────────────────────────┐
 │ 3. Rule-based Verification              │
 │    • Storage mismatch? → NOT duplicate  │
-│      "128GB" ≠ "256GB"                 │
+│      "128GB" ≠ "256GB"                  │
 │    • Screen size mismatch? → NOT dup    │
-│      "55 inch" ≠ "65 inch"             │
+│      "55 inch" ≠ "65 inch"              │
 │    • Re-check cosine on tight threshold │
 └──────────────────┬──────────────────────┘
                    │
@@ -47,7 +47,7 @@ Input CSV
 ┌─────────────────────────────────────────┐
 │ 4. Union-Find Grouping + Aggregate      │
 │    • Merge confirmed duplicate pairs    │
-│    • Handle chains: A=B, B=C → A=B=C   │
+│    • Handle chains: A=B, B=C → A=B=C    │
 │    • Surface lowest price per group     │
 └──────────────────┬──────────────────────┘
                    │
