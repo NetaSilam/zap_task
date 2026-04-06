@@ -1,7 +1,6 @@
 # Zap Product Deduplication Engine
 
-> **GenAI Exploration Lead – Home Assignment**  
-> 100% offline solution — no API keys, no external calls, no paid services.
+> **GenAI Exploration Lead - Home Assignment**  
 
 ---
 
@@ -11,7 +10,7 @@
 A product list contains duplicates with inconsistent names (Hebrew/English mixed, different word order, extra descriptors).  
 The goal: merge duplicates and show the customer the lowest available price.
 
-### Solution — 4-Step Pipeline (no API)
+### Solution - 4-Step Pipeline 
 
 ```
 Input CSV
@@ -78,7 +77,7 @@ zap-dedup/
 ## Quick Start
 
 ```bash
-# 1. Install dependencies (all open-source, no API keys)
+# 1. Install dependencies 
 pip install -r requirements.txt
 
 # 2. Run on sample data
@@ -132,4 +131,4 @@ pytest ../tests/
 
 ---
 
-*Built with Python · pandas · scikit-learn — no API keys required*
+*Built with Python · pandas · scikit-learn*
