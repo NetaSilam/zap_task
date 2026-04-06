@@ -115,8 +115,8 @@ pytest ../tests/
 | Decision | Rationale |
 |---|---|
 | **No API keys** | Fully reproducible, free to run, no vendor lock-in |
-| **char n-gram TF-IDF** | Handles typos, mixed languages, partial names — better than word-level |
-| **Category blocking** | A phone can never be a TV — skip cross-category comparisons |
+| **char n-gram TF-IDF** | Handles typos, mixed languages, partial names - better than word-level |
+| **Category blocking** | A phone can never be a TV - skip cross-category comparisons |
 | **Storage/size rules** | These are the most common false-positive source; rule-based is 100% reliable |
 | **Union-Find** | Correctly handles transitive chains (A=B, B=C → same group) |
 | **Conservative threshold** | When in doubt → don't merge (avoid false positives shown to customer) |
@@ -126,7 +126,7 @@ pytest ../tests/
 ## Extending
 
 - **Scale**: Process in chunks; use approximate nearest-neighbour (FAISS) instead of dense cosine for 100k+ products  
-- **Accuracy**: Add a fine-tuned sentence-transformer (e.g. `paraphrase-multilingual-MiniLM`) for embedding similarity — still no API key needed  
+- **Accuracy**: Add a fine-tuned sentence-transformer (e.g. `paraphrase-multilingual-MiniLM`) for embedding similarity  
 - **Real-time**: Wrap `deduplicate()` in a FastAPI endpoint; cache TF-IDF matrix between requests  
 
 ---
