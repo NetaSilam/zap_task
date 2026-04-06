@@ -19,7 +19,7 @@ Input CSV
 ┌─────────────────────────────────────────┐
 │ 1. Normalization  (utils.py)            │
 │    • Hebrew brands → English            │
-│      "סמסונג" → "samsung"               │ 
+│      "סמסונג" → "samsung"                │ 
 │    • Remove punctuation & noise words   │
 │    • Collapse whitespace                │
 └──────────────────┬──────────────────────┘
