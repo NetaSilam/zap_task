@@ -1,0 +1,21 @@
+id,name,price,category,store
+1,Samsung Galaxy S23,2999,phones,KSP
+2,סמסונג גלקסי S23,3100,phones,Bug
+3,Samsung S23 256GB,2850,phones,ivory
+4,galaxy s23 samsung,3200,phones,Zap
+5,iPhone 14 Pro 256GB,4200,phones,KSP
+6,אייפון 14 פרו,4500,phones,Bug
+7,Apple iPhone 14 Pro,4100,phones,ivory
+8,iphone14pro 256,4300,phones,Zap
+9,LG OLED TV 55,3500,tv,KSP
+10,טלויזיה LG OLED 55 אינץ,3800,tv,Bug
+11,LG 55 OLED C2,3400,tv,ivory
+12,Sony WH-1000XM5,1200,audio,KSP
+13,סוני אוזניות WH1000XM5,1350,audio,Bug
+14,Sony WH 1000XM5 Headphones,1100,audio,ivory
+15,Dyson V15 Detect,2200,vacuum,KSP
+16,דייסון V15,2400,vacuum,Bug
+17,Dyson V15 Detect Absolute,2150,vacuum,ivory
+18,Samsung 65 QLED Q80B,5500,tv,KSP
+19,סמסונג QLED 65 Q80B,5800,tv,Bug
+20,SAMSUNG Q80B 65inch QLED,5300,tv,ivory
