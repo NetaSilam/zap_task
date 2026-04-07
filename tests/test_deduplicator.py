@@ -1,8 +1,5 @@
 """
-tests/test_deduplicator.py
-==========================
 Unit tests — run with: pytest tests/
-No API keys, no network.
 """
 
 import sys
@@ -17,7 +14,7 @@ from utils import normalize, extract_storage, extract_screen_size
 from deduplicator import Product, are_duplicates, candidate_pairs, deduplicate
 
 
-# ── normalize() ──────────────────────────────────────────────────────────────
+# normalize() 
 
 class TestNormalize:
     def test_lowercase(self):
@@ -37,7 +34,7 @@ class TestNormalize:
         assert "!" not in normalize("Samsung Galaxy S23!")
 
 
-# ── extract helpers ───────────────────────────────────────────────────────────
+# extract helpers 
 
 class TestExtractStorage:
     def test_gb(self):          assert extract_storage("iPhone 256GB") == "256gb"
@@ -50,7 +47,7 @@ class TestExtractScreenSize:
     def test_none(self):        assert extract_screen_size("Sony WH-1000XM5") is None
 
 
-# ── are_duplicates() ─────────────────────────────────────────────────────────
+# are_duplicates() 
 
 def make(name, price=1000, cat="phones", store="KSP", pid=1):
     return Product(id=pid, name=name, price=price, category=cat, store=store)
@@ -77,7 +74,7 @@ class TestAreDuplicates:
         assert are_duplicates(a, b) is False
 
 
-# ── full pipeline ─────────────────────────────────────────────────────────────
+# full pipeline 
 
 class TestDeduplicate:
     def test_sample_data(self):

@@ -6,60 +6,36 @@
 
 ## Approach
 
-### The Problem
+### 1. The Problem
 A product list contains duplicates with inconsistent names (Hebrew/English mixed, different word order, extra descriptors).  
-The goal: merge duplicates and show the customer the lowest available price.
+The goal is to merge duplicates and surface the lowest available price.
 
-### Solution - 4-Step Pipeline 
+### 2. Solution - 4-Step Pipeline
 
-```
-Input CSV
-    │
-    ▼
-┌─────────────────────────────────────────┐
-│ 1. Normalization  (utils.py)            │
-│    • Hebrew brands → English            │
-│      "סמסונג" → "samsung"                 │ 
-│    • Remove punctuation & noise words   │
-│    • Collapse whitespace                │
-└──────────────────┬──────────────────────┘
-                   │
-                   ▼
-┌─────────────────────────────────────────┐
-│ 2. TF-IDF Blocking  (deduplicator.py)   │
-│    • char n-gram cosine similarity      │
-│    • Only compares within same category │
-│    • Produces small set of candidates   │
-│      (avoids O(n²) full comparison)     │
-└──────────────────┬──────────────────────┘
-                   │
-                   ▼
-┌─────────────────────────────────────────┐
-│ 3. Rule-based Verification              │
-│    • Storage mismatch? → NOT duplicate  │
-│      "128GB" ≠ "256GB"                  │
-│    • Screen size mismatch? → NOT dup    │
-│      "55 inch" ≠ "65 inch"              │
-│    • Re-check cosine on tight threshold │
-└──────────────────┬──────────────────────┘
-                   │
-                   ▼
-┌─────────────────────────────────────────┐
-│ 4. Union-Find Grouping + Aggregate      │
-│    • Merge confirmed duplicate pairs    │
-│    • Handle chains: A=B, B=C → A=B=C    │
-│    • Surface lowest price per group     │
-└──────────────────┬──────────────────────┘
-                   │
-                   ▼
-             Output CSV
-```
+1. **Normalization (`utils.py`)**  
+   - Hebrew brands → English (`"סמסונג" → "samsung"`)  
+   - Remove punctuation and noise words  
+   - Collapse whitespace  
+
+2. **TF-IDF Blocking (`deduplicator.py`)**  
+   - Character n-gram cosine similarity  
+   - Compare only within the same category  
+   - Produce a small set of candidates (avoids O(n²) full comparison)  
+
+3. **Rule-based Verification**  
+   - Storage mismatch → NOT duplicate (`"128GB" ≠ "256GB"`)  
+   - Screen size mismatch → NOT duplicate (`"55 inch" ≠ "65 inch"`)  
+   - Re-check cosine similarity with tighter threshold  
+
+4. **Union-Find Grouping + Aggregation**  
+   - Merge confirmed duplicate pairs  
+   - Handle chains: A=B, B=C → A=B=C  
+   - Surface the lowest price per group  
 
 ---
 
 ## Project Structure
 
-```
 zap-dedup/
 ├── data/
 │   └── products_sample.csv   # 20 sample products with deliberate duplicates
@@ -67,17 +43,15 @@ zap-dedup/
 │   ├── deduplicator.py       # Main pipeline
 │   └── utils.py              # Normalization, Hebrew→English map, helpers
 ├── tests/
-│   └── test_deduplicator.py  # pytest — covers normalize, rules, full pipeline
+│   └── test_deduplicator.py  # pytest - covers normalize, rules, full pipeline
 ├── requirements.txt
 └── README.md
-```
 
 ---
 
 ## Quick Start
 
-```bash
-# 1. Install dependencies 
+# 1. Install dependencies
 pip install -r requirements.txt
 
 # 2. Run on sample data
@@ -86,27 +60,26 @@ python deduplicator.py ../data/products_sample.csv --output results.csv
 
 # 3. Run tests
 pytest ../tests/
-```
 
-### Example output
+### Example Output
 
-```
-[1/4] Loaded 20 products.
-[2/4] 12 candidate pairs after TF-IDF blocking.
-[3/4] Rule-based verification: 9 duplicate pairs confirmed.
-[4/4] Done. 20 listings → 6 unique products (6 groups had duplicates).
+[1/5] Loaded 20 products.
+[2/5] 41 candidate pairs.
+[3/5] 21 duplicate pairs confirmed.
+[4/5] Done: 20 → 7 groups.
+GROUPS:
 
-📦  Samsung S23 256GB
-    ✅ Best price: ₪2,850  @ ivory
-    → ₪2,850  Samsung S23 256GB
-       ₪2,999  Samsung Galaxy S23
-       ₪3,100  סמסונג גלקסי S23
-       ₪3,200  galaxy s23 samsung
+  Samsung S23 256GB  (4 items)
+     Lowest: ₪2,850 @ ivory
+    - ₪2,999  Samsung Galaxy S23
+    - ₪3,100  סמסונג גלקסי S23
+    - ₪2,850  Samsung S23 256GB
+    - ₪3,200  galaxy s23 samsung
 
-📦  Apple iPhone 14 Pro
-    ✅ Best price: ₪4,100  @ ivory
+  Apple iPhone 14 Pro  (3 items)
+     Lowest: ₪4,100 @ ivory
+    - ₪4,200  iPhone 14 Pro 256GB
     ...
-```
 
 ---
 
@@ -115,20 +88,20 @@ pytest ../tests/
 | Decision | Rationale |
 |---|---|
 | **No API keys** | Fully reproducible, free to run, no vendor lock-in |
-| **char n-gram TF-IDF** | Handles typos, mixed languages, partial names - better than word-level |
-| **Category blocking** | A phone can never be a TV - skip cross-category comparisons |
-| **Storage/size rules** | These are the most common false-positive source; rule-based is 100% reliable |
-| **Union-Find** | Correctly handles transitive chains (A=B, B=C → same group) |
-| **Conservative threshold** | When in doubt → don't merge (avoid false positives shown to customer) |
+| **Character n-gram TF-IDF** | Handles typos, mixed languages, partial names; better than word-level |
+| **Category blocking** | Phones cannot be TVs - skip cross-category comparisons |
+| **Storage/size rules** | Most common source of false positives; rule-based is reliable |
+| **Union-Find** | Handles transitive chains correctly (A=B, B=C → same group) |
+| **Conservative threshold** | When in doubt, do not merge (avoids false positives shown to customers) |
 
 ---
 
 ## Extending
 
-- **Scale**: Process in chunks; use approximate nearest-neighbour (FAISS) instead of dense cosine for 100k+ products  
-- **Accuracy**: Add a fine-tuned sentence-transformer (e.g. `paraphrase-multilingual-MiniLM`) for embedding similarity  
-- **Real-time**: Wrap `deduplicate()` in a FastAPI endpoint; cache TF-IDF matrix between requests  
+1. **Scale**: Process in chunks; use approximate nearest neighbor (FAISS) instead of dense cosine similarity for 100k+ products  
+2. **Accuracy**: Use a fine-tuned sentence-transformer for embedding similarity (`paraphrase-multilingual-MiniLM`)  
+3. **Real-time**: Wrap `deduplicate()` in a FastAPI endpoint; cache TF-IDF matrix between requests  
 
 ---
 
-*Built with Python · pandas · scikit-learn*
+*Built with Python · pandas · scikit-learn*  
