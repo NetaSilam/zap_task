@@ -35,7 +35,6 @@ The goal is to merge duplicates and surface the lowest available price.
 ---
 
 ## Project Structure
-
 zap-dedup/
 ├── data/
 │   └── products_sample.csv   # 20 sample products with deliberate duplicates
@@ -50,8 +49,8 @@ zap-dedup/
 ---
 
 ## Quick Start
-
-# 1. Install dependencies
+bash
+# 1. Install dependencies 
 pip install -r requirements.txt
 
 # 2. Run on sample data
