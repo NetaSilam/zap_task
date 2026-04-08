@@ -1,25 +1,28 @@
 """
 Text-normalisation helpers.
-Noise words are detected via POS tagging,
+multilingual embedding model which handles Hebrew/English natively.
 """
 
 from __future__ import annotations
 import re
 import unicodedata
 
-# POS tags treated as noise 
+# POS tags treated as noise
 _NOISE_POS = {"ADJ", "ADV", "INTJ", "PART", "SYM", "DET", "PUNCT"}
 
-# Lazy model loader 
+# Fallback noise words used when spaCy is unavailable
+FALLBACK_NOISE = {
+    "חדש", "מקורי", "אחריות", "משלוח", "חינם", "מהיר", "אונליין",
+    "new", "original", "warranty", "fast", "online", "best", "price",
+    "smartphone", "סמארטפון",
+}
 
-_models: dict[str, object] = {}   # cache: lang -> nlp | False
+# Lazy model loader
+
+_models: dict[str, object] = {}
 
 
 def _load_model(lang: str) -> object:
-    """
-    Load spaCy model for `lang` ('en' or 'he') once, cache result.
-    Returns nlp object or False if unavailable.
-    """
     if lang in _models:
         return _models[lang]
 
@@ -40,7 +43,7 @@ def _load_model(lang: str) -> object:
     return _models[lang]
 
 
-# Token helpers 
+# Token helpers
 
 _RE_HEBREW = re.compile(r"[א-ת]")
 
@@ -50,10 +53,6 @@ def _is_hebrew_token(tok: str) -> bool:
 
 
 def _pos_tag_segment(text: str, lang: str) -> dict[str, str]:
-    """
-    Run spaCy POS tagging and return {token_lower: POS}.
-    Returns empty dict if model unavailable.
-    """
     nlp = _load_model(lang)
     if not nlp or not text.strip():
         return {}
@@ -62,40 +61,25 @@ def _pos_tag_segment(text: str, lang: str) -> dict[str, str]:
 
 
 def _split_concatenated(text: str) -> str:
-    """
-    Split concatenated tokens
-    """
+    """Split concatenated tokens."""
     text = re.sub(r"([a-zא-ת])(\d)", r"\1 \2", text)
     text = re.sub(r"(\d)([a-zא-ת])", r"\1 \2", text)
     return text
 
 
-def _normalize_hebrew_brands(text: str) -> str:
-    """
-    Minimal Hebrew → English brand normalization.
-    """
-    return (
-        text.replace("סמסונג", "samsung")
-            .replace("דייסון", "dyson")
-            .replace("אייפון", "iphone")
-    )
-
-
-# Public API 
+# Public API
 
 def normalize(text: str) -> str:
     """
     Normalize product name:
-
       1. Lowercase + strip diacritics
       2. Remove punctuation
-      3. Normalize Hebrew brand names (light heuristic)
-      4. KEEP both original AND split tokens 
-      5. POS-based noise filtering
-      6. Collapse whitespace
+      3. Split concatenated tokens
+      4. POS-based noise filtering (fallback to hardcoded list)
+      5. Collapse whitespace
 
-    Design principle:
-    Conservative - prefer false negatives over false positives.
+    No brand translation - mixed-script pairs are always forwarded
+    to the multilingual embedding model by the blocking step.
     """
     text = text.lower().strip()
 
@@ -107,12 +91,10 @@ def normalize(text: str) -> str:
     text = re.sub(r"[^a-z0-9א-ת\s]", " ", text)
     text = re.sub(r"\s+", " ", text).strip()
 
-    # Hebrew brand normalization
-    text = _normalize_hebrew_brands(text)
-
-    # Keep BOTH original and split versions
+    # Only append split version if it actually differs
     split_text = _split_concatenated(text)
-    text = f"{text} {split_text}"
+    if split_text != text:
+        text = f"{text} {split_text}"
     text = re.sub(r"\s+", " ", text).strip()
 
     # POS tagging by language
@@ -122,17 +104,19 @@ def normalize(text: str) -> str:
     he_pos = _pos_tag_segment(hebrew_segment, "he")
     en_pos = _pos_tag_segment(english_segment, "en")
 
+    spacy_available = bool(he_pos or en_pos)
+
     # Filter noise tokens
     tokens = []
     for tok in text.split():
         tok_lower = tok.lower()
 
-        if _is_hebrew_token(tok):
-            pos = he_pos.get(tok_lower)
-        else:
-            pos = en_pos.get(tok_lower)
+        # Fallback: use hardcoded list when spaCy unavailable
+        if not spacy_available and tok_lower in FALLBACK_NOISE:
+            continue
 
-        # If POS known and considered noise - drop
+        pos = he_pos.get(tok_lower) if _is_hebrew_token(tok) else en_pos.get(tok_lower)
+
         if pos is not None and pos in _NOISE_POS:
             continue
 
@@ -142,17 +126,22 @@ def normalize(text: str) -> str:
 
 
 def extract_storage(text: str) -> str | None:
-    """Return storage spec: '256gb', '1024gb'."""
+    # Match explicit unit e.g. 256GB, 1TB
     m = re.search(r"(\d+)\s*(gb|tb|mb)", text.lower())
     if m:
         val, unit = int(m.group(1)), m.group(2)
         return f"{val * 1024 if unit == 'tb' else val}gb"
+    # Match bare storage-sized number with no unit suffix
+    m2 = re.search(r"\b(128|256|512|1024|2048)\b", text.lower())
+    if m2:
+        return f"{m2.group(1)}gb"
     return None
 
 
 def extract_screen_size(text: str) -> str | None:
-    """Return screen size: '55', '65'."""
-    m = re.search(r"\b(\d{2,3})\s*(?:inch|אינץ|\")?(?:\s|$)", text.lower())
+    # Only match realistic screen sizes (20-120 inches)
+    # Avoids false matches on storage numbers like 256, 512
+    m = re.search(r"\b([2-9]\d|1[01]\d|120)\s*(?:inch|אינץ|\")?(?:\s|$)", text.lower())
     return m.group(1) if m else None
 
 
