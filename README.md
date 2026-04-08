@@ -35,12 +35,14 @@ The goal is to merge duplicates and surface the lowest available price.
 ---
 
 ## Project Structure
+
+```bash
 zap-dedup/
 ├── data/
 │   └── products_sample.csv   # 20 sample products with deliberate duplicates
 ├── src/
 │   ├── deduplicator.py       # Main pipeline
-│   └── utils.py              # Normalization, Hebrew→English map, helpers
+│   └── utils.py              # Normalization, helpers
 ├── tests/
 │   └── test_deduplicator.py  # pytest - covers normalize, rules, full pipeline
 ├── requirements.txt
@@ -49,7 +51,8 @@ zap-dedup/
 ---
 
 ## Quick Start
-bash
+
+```bash
 # 1. Install dependencies 
 pip install -r requirements.txt
 
