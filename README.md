@@ -36,6 +36,7 @@ The goal is to merge duplicates and surface the lowest available price.
 
 ## Project Structure
 
+```
 zap-dedup/
 ├── data/
 │   └── products_sample.csv   # 20 sample products with deliberate duplicates
@@ -46,6 +47,7 @@ zap-dedup/
 │   └── test_deduplicator.py  # pytest - covers normalize, rules, full pipeline
 ├── requirements.txt
 └── README.md
+```
 
 ---
 
@@ -69,6 +71,7 @@ pytest ../tests/
 
 ### Example Output
 
+```
 [1/5] Loaded 20 products.
 [2/5] 41 candidate pairs.
 [3/5] 21 duplicate pairs confirmed.
@@ -86,6 +89,7 @@ GROUPS:
      Lowest: ₪4,100 @ ivory
     - ₪4,200  iPhone 14 Pro 256GB
     ...
+```
 
 ---
 
@@ -110,4 +114,4 @@ GROUPS:
 
 ---
 
-*Built with Python · pandas · scikit-learn*  
+*Built with Python · pandas · scikit-learn*
