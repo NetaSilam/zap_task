@@ -36,7 +36,6 @@ The goal is to merge duplicates and surface the lowest available price.
 
 ## Project Structure
 
-```bash
 zap-dedup/
 ├── data/
 │   └── products_sample.csv   # 20 sample products with deliberate duplicates
@@ -52,16 +51,21 @@ zap-dedup/
 
 ## Quick Start
 
+### 1. Install dependencies
 ```bash
-# 1. Install dependencies 
 pip install -r requirements.txt
+```
 
-# 2. Run on sample data
+### 2. Run on sample data
+```bash
 cd src
 python deduplicator.py ../data/products_sample.csv --output results.csv
+```
 
-# 3. Run tests
+### 3. Run tests
+```bash
 pytest ../tests/
+```
 
 ### Example Output
 
