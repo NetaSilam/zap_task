@@ -131,6 +131,13 @@ GROUPS:
 3. **Real-time** - Wrap `deduplicate()` in a FastAPI endpoint; cache TF-IDF matrix between requests
 4. **Confidence scores** - Expose the embedding similarity score per group for human review of borderline cases
 
+### With API Access
+
+The current solution runs fully offline by design. Given API access, two meaningful upgrades are possible:
+
+- **LLM-based verification** - For borderline pairs (embedding score near threshold), call LLM (GPT/Gemini/...) to make the final duplicate decision. The model receives both product names and returns a structured verdict with reasoning. This replaces the need to hand-tune thresholds.
+- **Dynamic noise-word generation** - Instead of the static Hebrew noise list, prompt an LLM once at startup to generate a comprehensive, context-aware list of filler words for product catalog normalization - covering slang, seasonal terms, and seller-specific boilerplate that a static list would miss.
+
 ---
 
 *Built with Python · pandas · scikit-learn · sentence-transformers · spaCy*
