@@ -244,10 +244,10 @@ def deduplicate(df: pd.DataFrame) -> pd.DataFrame:
         )
         for _, row in df.iterrows()
     ]
-    print(f"[1/5] Loaded {len(products)} products.")
+    print(f"[1/4] Loaded {len(products)} products.")
 
     pairs = candidate_pairs(products)
-    print(f"[2/5] {len(pairs)} candidate pairs.")
+    print(f"[2/4] {len(pairs)} candidate pairs.")
 
     model = load_embedding_model()
     embeddings = embed_all(model, products)
@@ -258,7 +258,7 @@ def deduplicate(df: pd.DataFrame) -> pd.DataFrame:
         if are_duplicates(products[i], products[j], embeddings[i], embeddings[j]):
             uf.union(i, j)
             confirmed += 1
-    print(f"[3/5] {confirmed} duplicate pairs confirmed.")
+    print(f"[3/4] {confirmed} duplicate pairs confirmed.")
 
     rows = []
     for gid, members in enumerate(uf.groups().values()):
@@ -277,7 +277,7 @@ def deduplicate(df: pd.DataFrame) -> pd.DataFrame:
 
     result = pd.DataFrame(rows).sort_values("group_id").reset_index(drop=True)
     dupes  = result[result["member_count"] > 1]
-    print(f"[4/5] Done: {len(products)} listings -> {len(result)} unique products "
+    print(f"[4/4] Done: {len(products)} listings -> {len(result)} unique products "
           f"({len(dupes)} groups had duplicates).")
     return result
 

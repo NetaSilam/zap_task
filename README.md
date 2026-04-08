@@ -83,10 +83,10 @@ pytest ../tests/
 ### Example Output
 
 ```
-[1/5] Loaded 20 products.
-[2/5] 40 candidate pairs.
-[3/5] 19 duplicate pairs confirmed.
-[4/5] Done: 20 listings -> 7 unique products (6 groups had duplicates).
+[1/4] Loaded 20 products.
+[2/4] 40 candidate pairs.
+[3/4] 19 duplicate pairs confirmed.
+[4/4] Done: 20 listings -> 7 unique products (6 groups had duplicates).
 
 GROUPS:
 
